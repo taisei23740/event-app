@@ -1,9 +1,12 @@
-package event_app;
+package event_app.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import event_app.repository.UserRepository;
+import event_app.service.EventApplicationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -14,13 +17,11 @@ import org.springframework.ui.Model;
 public class HomeController {
 
     private final UserRepository userRepository;
-    private final EventRepository eventRepository;
-    private  final EventApplicationRepository eventApplicationRepository;
+    private final EventApplicationService eventApplicationService;
 
-    public HomeController(UserRepository userRepository,EventRepository eventRepository,EventApplicationRepository eventApplicationRepository) {
+    public HomeController(UserRepository userRepository, EventApplicationService eventApplicationService) {
         this.userRepository = userRepository;
-        this.eventRepository = eventRepository;
-        this.eventApplicationRepository = eventApplicationRepository;
+        this.eventApplicationService = eventApplicationService;
     }   
 
     @GetMapping("/")
@@ -77,35 +78,35 @@ public class HomeController {
             }
         }
 
-        boolean exists = eventRepository.existsByEventId(eventId);
+        String errorMessage = eventApplicationService.checkEvent(eventId);
         
-        if (!exists) {
-            model.addAttribute("errorMessage","イベントが見つかりません");
+        if (errorMessage != null) {
+            model.addAttribute("errorMessage",errorMessage);
             return "event-error";
         }
 
-        boolean alreadyApplied = eventApplicationRepository.existsByEventIdAndUserId(eventId,userId);
+        errorMessage = eventApplicationService.alreadyApplied(eventId,userId);
 
-        if (alreadyApplied) {
-            model.addAttribute("errorMessage","既に申し込み済みです");
+        if (errorMessage != null) {
+            model.addAttribute("errorMessage",errorMessage);
             return "event-error";
         }
 
-        boolean full_capacity = eventApplicationRepository.isFull(eventId);
+        errorMessage = eventApplicationService.capaOver(eventId);
 
-        if (full_capacity) {
-            model.addAttribute("errorMessage","定員オーバーです");
+        if (errorMessage != null) {
+            model.addAttribute("errorMessage",errorMessage);
             return "event-error";
         }
 
-        boolean registrationOpen = eventRepository.isRegistrationOpen(eventId);
+        errorMessage = eventApplicationService.checkApplicationDeadline(eventId);
 
-        if (!registrationOpen) {
-            model.addAttribute("errorMessage","応募期限を過ぎています");
+        if (errorMessage != null) {
+            model.addAttribute("errorMessage",errorMessage);
             return "event-error";
         }
 
-        eventApplicationRepository.add_apply(eventId, userId);
+        eventApplicationService.apply(eventId, userId);
         System.out.println("申し込み完了");
 
         return "application-completed";

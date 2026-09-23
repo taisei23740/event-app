@@ -1,4 +1,4 @@
-package event_app;
+package event_app.repository;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
