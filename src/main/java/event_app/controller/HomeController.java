@@ -69,15 +69,6 @@ public class HomeController {
             return "event-error";
         }
 
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("JSESSIONID")) {
-                String sessionId = cookie.getValue();
-
-                System.out.println("SessionID:" + sessionId);
-                System.out.println("UserID:" + userId);
-            }
-        }
-
         String errorMessage = eventApplicationService.checkEvent(eventId);
         
         if (errorMessage != null) {
