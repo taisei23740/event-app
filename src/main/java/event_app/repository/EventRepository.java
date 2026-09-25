@@ -53,4 +53,17 @@ public class EventRepository {
 
         return !now.isAfter(deadline);
     }
+
+    public Integer getCapacityForUpdate(Integer eventId) {
+
+        String sql =
+            "SELECT capacity " +
+            "FROM event " +
+            "WHERE event_id = ? " +
+            "FOR UPDATE";
+
+        return jdbcTemplate.queryForObject(
+            sql, Integer.class, eventId
+        );
+    }
 }

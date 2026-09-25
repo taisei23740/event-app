@@ -8,7 +8,7 @@ public class EventApplicationRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public EventApplicationRepository(JdbcTemplate jdbcTemplate) {
+    public EventApplicationRepository(JdbcTemplate jdbcTemplate,EventRepository eventRepository) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -29,7 +29,7 @@ public class EventApplicationRepository {
         return count != null && count > 0;
     }
 
-    public boolean isFull(Integer eventId) {
+    public Integer apply_count(Integer eventId) {
 
         String application_sql =
                 "SELECT count(*) " +
@@ -42,18 +42,7 @@ public class EventApplicationRepository {
                 eventId
         );
 
-         String event_sql =
-                "SELECT capacity " +
-                "FROM event " +
-                "WHERE event_id = ?";
-
-        Integer capacity = jdbcTemplate.queryForObject(
-                event_sql,
-                Integer.class,
-                eventId
-        );
-
-        return count >= capacity; 
+        return count; 
     }
 
     public void add_apply(Integer eventId,Integer userId){

@@ -1,6 +1,7 @@
 package event_app.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import event_app.repository.EventApplicationRepository;
 import event_app.repository.EventRepository;
@@ -17,48 +18,37 @@ public class EventApplicationService  {
         this.eventApplicationRepository = eventApplicationRepository;
     }
 
-    public String checkEvent(int eventId) {
+    @Transactional 
+    public String applyEvent(int eventId,int userId) { 
+
         boolean event_exists = eventRepository.existsByEventId(eventId);
 
         if (! event_exists) {
             return "イベントが見つかりません";
         }
 
-        return null;
-    }
-
-    public String alreadyApplied(int eventId,int userId) {
         boolean alreadyApplied = eventApplicationRepository.existsByEventIdAndUserId(eventId,userId);
 
         if (alreadyApplied) {
             return "既に申し込み済みです";
         }
 
-        return null;
-    }
+        Integer capacity = eventRepository.getCapacityForUpdate(eventId);
+        Integer count = eventApplicationRepository.apply_count(eventId);
 
-    public String capaOver(int eventId) {
-        boolean capaOver = eventApplicationRepository.isFull(eventId);
-
-        if (capaOver) {
-            return "定員オーバーです";
+        if (count >= capacity) {
+        return "定員オーバーです";
         }
 
-        return null;
-    }
-
-    public String checkApplicationDeadline(int eventId) {
         boolean checkApplicationDeadline = eventRepository.isRegistrationOpen(eventId);
 
         if (!checkApplicationDeadline) {
             return "申し込み期限を過ぎています";
         }
+        
+        eventApplicationRepository.add_apply(eventId, userId);
 
         return null;
-    }
-    
-    public void apply(int eventId, int userId) {
-        eventApplicationRepository.add_apply(eventId, userId);
     }
 
 }
