@@ -1,5 +1,7 @@
 package event_app.repository;
 
+import java.util.List;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -19,13 +21,17 @@ public class UserRepository {
                 "FROM users " +
                 "WHERE email = ? AND password = ?";
 
-        Integer userId = jdbcTemplate.queryForObject(
+        List<Integer> userId = jdbcTemplate.query(
                 sql,
-                Integer.class,
+                (rs, rowNum) -> rs.getInt("user_id"),
                 email,
                 password
         );
 
-        return userId;
+        if (userId.isEmpty()) {
+            return null;
+        }
+
+        return userId.get(0);
     }
 }
