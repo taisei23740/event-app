@@ -44,7 +44,7 @@ public class HomeController {
         if (userId != null) {
             session.setAttribute("userId", userId);
             System.out.println("ログイン成功");
-            return "login";
+            return "redirect:/event";
         } else {
             model.addAttribute("errorMessage","メールアドレスまたはパスワードが違います");
             return "login-error";
