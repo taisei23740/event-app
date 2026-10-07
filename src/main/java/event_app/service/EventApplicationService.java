@@ -27,13 +27,14 @@ public class EventApplicationService  {
             return "イベントが見つかりません";
         }
 
+        Integer capacity = eventRepository.getCapacityForUpdate(eventId);
+
         boolean alreadyApplied = eventApplicationRepository.existsByEventIdAndUserId(eventId,userId);
 
         if (alreadyApplied) {
             return "既に申し込み済みです";
         }
 
-        Integer capacity = eventRepository.getCapacityForUpdate(eventId);
         Integer count = eventApplicationRepository.apply_count(eventId);
 
         if (count >= capacity) {
