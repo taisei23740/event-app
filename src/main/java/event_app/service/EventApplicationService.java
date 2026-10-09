@@ -3,6 +3,7 @@ package event_app.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import event_app.ApplyEventResult;
 import event_app.repository.EventApplicationRepository;
 import event_app.repository.EventRepository;
 
@@ -19,12 +20,12 @@ public class EventApplicationService  {
     }
 
     @Transactional 
-    public String applyEvent(int eventId,int userId) { 
+    public ApplyEventResult applyEvent(int eventId,int userId) { 
 
         boolean event_exists = eventRepository.existsByEventId(eventId);
 
         if (! event_exists) {
-            return "イベントが見つかりません";
+            return ApplyEventResult.EVENT_NOT_FOUND;
         }
 
         Integer capacity = eventRepository.getCapacityForUpdate(eventId);
@@ -32,24 +33,24 @@ public class EventApplicationService  {
         boolean alreadyApplied = eventApplicationRepository.existsByEventIdAndUserId(eventId,userId);
 
         if (alreadyApplied) {
-            return "既に申し込み済みです";
+            return ApplyEventResult.ALREADY_APPLIED;
         }
 
         Integer count = eventApplicationRepository.apply_count(eventId);
 
         if (count >= capacity) {
-        return "定員オーバーです";
+        return ApplyEventResult.FULL;
         }
 
         boolean checkApplicationDeadline = eventRepository.isRegistrationOpen(eventId);
 
         if (!checkApplicationDeadline) {
-            return "申し込み期限を過ぎています";
+            return ApplyEventResult.CLOSED;
         }
         
         eventApplicationRepository.add_apply(eventId, userId);
 
-        return null;
+        return ApplyEventResult.SUCCESS;
     }
 
 }

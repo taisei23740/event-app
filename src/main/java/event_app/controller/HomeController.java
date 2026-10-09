@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import event_app.ApplyEventResult;
 import event_app.repository.UserRepository;
 import event_app.service.EventApplicationService;
 import jakarta.servlet.http.HttpSession;
@@ -65,15 +66,21 @@ public class HomeController {
             return "event-error";
         }
 
-        String errorMessage = eventApplicationService.applyEvent(eventId,userId);
+        ApplyEventResult result = eventApplicationService.applyEvent(eventId,userId);
         
-        if (errorMessage != null) {
-            model.addAttribute("errorMessage",errorMessage);
-            return "event-error";
+        if (result == ApplyEventResult.SUCCESS) {
+            return "application-completed";
         }
 
-        System.out.println("申し込み完了");
+        String errorMessage = switch (result) {
+            case EVENT_NOT_FOUND -> "イベントが見つかりません";
+            case ALREADY_APPLIED -> "既に申し込み済みです";
+            case FULL -> "定員オーバーです";
+            case CLOSED -> "申し込み期限を過ぎています";
+            case SUCCESS -> throw new IllegalStateException("成功は先に処理する");
+        };
 
-        return "application-completed";
+        model.addAttribute("errorMessage",errorMessage);
+        return "event-error";
     }
 }
