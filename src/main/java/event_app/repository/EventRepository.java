@@ -3,7 +3,6 @@ package event_app.repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Repository
 public class EventRepository {
@@ -30,28 +29,18 @@ public class EventRepository {
 
     }
 
-    public boolean isRegistrationOpen(Integer eventId) {
+    public Timestamp findEventDatetime(Integer eventId) {
 
         String sql =
                 "SELECT event_datetime " +
                 "FROM event " +
                 "WHERE event_id = ?";
 
-        Timestamp eventDatetime = jdbcTemplate.queryForObject(
+        return jdbcTemplate.queryForObject(
             sql, 
             Timestamp.class,
             eventId
         );
-
-        LocalDateTime deadline =
-                eventDatetime.toLocalDateTime()
-                        .toLocalDate()
-                        .minusDays(1)
-                        .atTime(23,59,59);
-
-        LocalDateTime now = LocalDateTime.now();
-
-        return !now.isAfter(deadline);
     }
 
     public Integer getCapacityForUpdate(Integer eventId) {
