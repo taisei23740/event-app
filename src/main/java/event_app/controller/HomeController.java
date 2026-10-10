@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import event_app.ApplyEventResult;
 import event_app.repository.UserRepository;
 import event_app.service.EventApplicationService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 
@@ -38,11 +39,13 @@ public class HomeController {
         @RequestParam String email,
         @RequestParam String password,
         HttpSession session,
-        Model model) {
+        Model model,
+        HttpServletRequest request) {
 
         Integer userId = userRepository.findUserId(email, password);
 
         if (userId != null) {
+            request.changeSessionId();
             session.setAttribute("userId", userId);
             System.out.println("ログイン成功");
             return "redirect:/event";
