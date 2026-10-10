@@ -73,7 +73,7 @@ public class HomeController {
         }
 
         String errorMessage = switch (result) {
-            case EVENT_NOT_FOUND -> "イベントが見つかりません";
+            case EVENT_NOT_FOUND -> "指定されたイベントが見つかりませんでした。イベント一覧から選び直してください";
             case ALREADY_APPLIED -> "既に申し込み済みです";
             case FULL -> "定員オーバーです";
             case CLOSED -> "申し込み期限を過ぎています";
