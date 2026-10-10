@@ -65,8 +65,7 @@ public class HomeController {
 
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
-            model.addAttribute("errorMessage","イベントに申し込むにはログインが必要です");
-            return "event-error";
+            return "redirect:/login";
         }
 
         ApplyEventResult result = eventApplicationService.applyEvent(eventId,userId);
