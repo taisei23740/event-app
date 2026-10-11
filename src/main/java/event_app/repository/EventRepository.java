@@ -2,7 +2,9 @@ package event_app.repository;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+import event_app.Event;
 
 @Repository
 public class EventRepository {
@@ -13,46 +15,25 @@ public class EventRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean existsByEventId(int eventId) {
-        String sql =
-                "SELECT COUNT(*) " +
-                "FROM event " +
-                "WHERE event_id = ?";
+    public Optional<Event> findById(int eventId) {
 
-        Integer count = jdbcTemplate.queryForObject(
-            sql, 
-            Integer.class,
-            eventId
-        );
-
-        return count != null && count > 0;
-
-    }
-
-    public Timestamp findEventDatetime(Integer eventId) {
-
-        String sql =
-                "SELECT event_datetime " +
-                "FROM event " +
-                "WHERE event_id = ?";
-
-        return jdbcTemplate.queryForObject(
-            sql, 
-            Timestamp.class,
-            eventId
-        );
-    }
-
-    public Integer getCapacityForUpdate(Integer eventId) {
-
-        String sql =
-            "SELECT capacity " +
+        String sql = 
+            "SELECT event_id, capacity, event_datetime " +
             "FROM event " +
             "WHERE event_id = ? " +
             "FOR UPDATE";
+        
+            List<Event> events = jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> new Event(
+                    rs.getInt("event_id"),
+                    rs.getInt("capacity"),
+                    rs.getTimestamp("event_datetime")
+            ),
+            eventId
+            );
 
-        return jdbcTemplate.queryForObject(
-            sql, Integer.class, eventId
-        );
+        return events.stream().findFirst();
     }
+
 }

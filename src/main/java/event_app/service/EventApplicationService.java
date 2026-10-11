@@ -9,7 +9,7 @@ import event_app.ApplyEventResult;
 import event_app.repository.EventApplicationRepository;
 import event_app.repository.EventRepository;
 import java.time.Clock;
-import java.sql.Timestamp;
+import event_app.Event;
 
 @Service 
 public class EventApplicationService  {
@@ -29,13 +29,11 @@ public class EventApplicationService  {
     @Transactional 
     public ApplyEventResult applyEvent(int eventId,int userId) { 
 
-        boolean eventExists = eventRepository.existsByEventId(eventId);
-
-        if (! eventExists) {
+        Event event = eventRepository.findById(eventId).orElse(null);
+        
+        if (event == null) {
             return ApplyEventResult.EVENT_NOT_FOUND;
         }
-
-        Integer capacity = eventRepository.getCapacityForUpdate(eventId);
 
         boolean alreadyApplied = eventApplicationRepository.existsByEventIdAndUserId(eventId,userId);
 
@@ -45,15 +43,13 @@ public class EventApplicationService  {
 
         Integer count = eventApplicationRepository.applyCount(eventId);
 
-        if (count >= capacity) {
-        return ApplyEventResult.FULL;
+        if (count >= event.getCapacity()) {
+            return ApplyEventResult.FULL;
         }
 
+        boolean isRegistrationOpen = event.isRegistrationOpen(LocalDateTime.now(clock));
 
-
-        boolean checkApplicationDeadline = isRegistrationOpen(eventId);
-
-        if (!checkApplicationDeadline) {
+        if (!isRegistrationOpen) {
             return ApplyEventResult.CLOSED;
         }
 
@@ -61,18 +57,4 @@ public class EventApplicationService  {
 
         return ApplyEventResult.SUCCESS;
     }
-
-    public boolean isRegistrationOpen(Integer eventId) {
-        Timestamp eventDatetime = eventRepository.findEventDatetime(eventId);
-
-        LocalDateTime deadline =
-            eventDatetime.toLocalDateTime()
-            .toLocalDate()
-            .atStartOfDay();
-
-        LocalDateTime now = LocalDateTime.now(clock);
-
-        return now.isBefore(deadline);
-    }
-
 }
