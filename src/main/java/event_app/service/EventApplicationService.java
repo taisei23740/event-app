@@ -29,9 +29,9 @@ public class EventApplicationService  {
     @Transactional 
     public ApplyEventResult applyEvent(int eventId,int userId) { 
 
-        boolean event_exists = eventRepository.existsByEventId(eventId);
+        boolean eventExists = eventRepository.existsByEventId(eventId);
 
-        if (! event_exists) {
+        if (! eventExists) {
             return ApplyEventResult.EVENT_NOT_FOUND;
         }
 
@@ -43,7 +43,7 @@ public class EventApplicationService  {
             return ApplyEventResult.ALREADY_APPLIED;
         }
 
-        Integer count = eventApplicationRepository.apply_count(eventId);
+        Integer count = eventApplicationRepository.applyCount(eventId);
 
         if (count >= capacity) {
         return ApplyEventResult.FULL;
@@ -57,7 +57,7 @@ public class EventApplicationService  {
             return ApplyEventResult.CLOSED;
         }
 
-        eventApplicationRepository.add_apply(eventId, userId);
+        eventApplicationRepository.addApply(eventId, userId);
 
         return ApplyEventResult.SUCCESS;
     }

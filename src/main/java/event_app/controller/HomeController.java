@@ -11,11 +11,14 @@ import event_app.service.EventApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Controller
 public class HomeController {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
     private final UserRepository userRepository;
     private final EventApplicationService eventApplicationService;
 
@@ -28,7 +31,7 @@ public class HomeController {
     public String home() {
         return "index";
     }
-
+    
     @GetMapping("/login")
     public String login() {
         return "login";
@@ -47,7 +50,7 @@ public class HomeController {
         if (userId != null) {
             request.changeSessionId();
             session.setAttribute("userId", userId);
-            System.out.println("ログイン成功");
+            logger.info("ログイン成功");
             return "redirect:/event";
         } else {
             model.addAttribute("errorMessage","メールアドレスまたはパスワードが違います");

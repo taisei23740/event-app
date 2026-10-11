@@ -29,15 +29,15 @@ public class EventApplicationRepository {
         return count != null && count > 0;
     }
 
-    public Integer apply_count(Integer eventId) {
+    public Integer applyCount(Integer eventId) {
 
-        String application_sql =
+        String applicationSql =
                 "SELECT count(*) " +
                 "FROM event_application " +
                 "WHERE event_id = ?";
 
         Integer count = jdbcTemplate.queryForObject(
-                application_sql,
+                applicationSql,
                 Integer.class,
                 eventId
         );
@@ -45,14 +45,14 @@ public class EventApplicationRepository {
         return count; 
     }
 
-    public void add_apply(Integer eventId,Integer userId){
+    public void addApply(Integer eventId,Integer userId){
 
-        String application_sql =
+        String applicationSql =
                 "INSERT INTO event_application(event_id,user_id) " +
                 "VALUES (?,?)";
 
         jdbcTemplate.update(
-                application_sql,
+                applicationSql,
                 eventId,
                 userId
         );
