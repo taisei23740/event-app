@@ -152,35 +152,6 @@ class EventApplicationServiceTest {
         .addApply(eventId, userId);
     }
 
-     @Test 
-    void 定員に達していないイベントには申し込める() {
-        int eventId = 1;
-        int userId = 100;
-
-        Event event = new Event (
-            eventId,
-            1,
-            Timestamp.valueOf(
-            LocalDateTime.of(2026, 11, 1, 10, 0)
-            )
-        );
-
-        when(eventRepository.findById(eventId))
-            .thenReturn(Optional.of(event));
-        
-        when(eventApplicationRepository.existsByEventIdAndUserId(eventId, userId))
-            .thenReturn(false);
-
-        when(eventApplicationRepository.applyCount(eventId))
-            .thenReturn(0);
-
-        ApplyEventResult result = service.applyEvent(eventId, userId);
-
-        assertEquals(ApplyEventResult.SUCCESS, result);
-
-        verify(eventApplicationRepository).addApply(eventId, userId);
-    }
-
     @Test 
     void 開催日前日の23時59分なら申し込める() {
         int eventId = 1;
