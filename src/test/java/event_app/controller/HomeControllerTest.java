@@ -10,6 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import event_app.ApplyEventResult;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(HomeController.class)
 class HomeControllerTest {
@@ -51,8 +53,11 @@ class HomeControllerTest {
                 .post("/event")
                 .param("eventId", "1")
                 .sessionAttr("userId", 100)
-        );
+        )
+        .andExpect(status().isOk())
+        .andExpect(view().name("application-completed"));
 
         verify(eventApplicationService).applyEvent(1, 100);
+    
     }
 }
